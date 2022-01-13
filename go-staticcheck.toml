@@ -81,6 +81,16 @@ rewrite='!strings.Contains(:[1], :[2])'
 match='strings.Index(:[1], :[2]) < 0'
 rewrite='!strings.Contains(:[1], :[2])'
 
+############################################
+# https://staticcheck.io/docs/checks#S1002 #
+############################################
+[S1002_01]
+match='if :[1:e] == true '
+rewrite='if :[1]'
+
+[S1002_02]
+match='if :[1:e] == false '
+rewrite='if !:[1]'
 
 ############################################
 # https://staticcheck.io/docs/checks#S1004 #
@@ -104,6 +114,14 @@ rewrite='for range'
 [S1005_02]
 match='for :[~_] = range'
 rewrite='for range'
+
+[S1005_03]
+match='for :[1:e], :[~_] = range'
+rewrite='for :[1] = range'
+
+[S1005_04]
+match='for :[1:e], :[~_] := range'
+rewrite='for :[1] := range'
 
 ############################################
 # https://staticcheck.io/docs/checks#S1006 #
