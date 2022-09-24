@@ -130,15 +130,43 @@ rewrite='for :[1] := range'
 match='for true {:[x]}'
 rewrite='for {:[x]}'
 
+############################################
+#https://staticcheck.io/docs/checks#S1009 #
+############################################
+[S1009]
+match='if :[[x]] != nil && len(:[[x]]) != 0 {:[body]}'
+rewrite='if len(:[[x]]) != 0 {:[body]}'
+[S1009_01]
+match='if :[[x]] == nil || len(:[[x]]) == 0 {:[body]}'
+rewrite='if len(:[[x]]) == 0 {:[body]}'
 
 ############################################
 # https://staticcheck.io/docs/checks#S1010 #
 ############################################
 # Small chance of FP: if builtin `len` is reassigned.
-[S1010_01]
+[S1010]
 match=':[s.][:len(:[s])]'
 rewrite=':[s.][:]'
 
+############################################
+#https://staticcheck.io/docs/checks#S1011 #
+############################################
+[S1011]
+match='for _, :[[e]] := range :[[y]] { :[[x]] = append(:[[x]], :[[e]]) }'
+rewrite=':[[x]] = append(:[[x]], :[[y]]...)'
+[S1011_01]
+match='for :[[i]] := range :[[y]] { :[[x]] = append(:[[x]], :[[y]][i]) }'
+rewrite=':[[x]] = append(:[[x]], :[[y]]...)'
+[S1011_02]
+match='for :[[i]] := range :[[y]] { :[[x]] = append(:[[x]], :[[y]][i]) }'
+rewrite=':[[x]] = append(:[[x]], :[[y]]...)'
+[S1011_03]
+match='''
+for :[[i]] := range :[[y]] {
+v := :[[y]][:[[i]]]
+:[[x]] = append(:[[x]], :[[v]])
+}'''
+rewrite=':[[x]] = append(:[[x]], :[[y]]...)'
 
 ############################################
 # https://staticcheck.io/docs/checks#S1012 #
@@ -338,6 +366,15 @@ rewrite='fmt.Errorf(:[1])'
 match='for :[~_], :[r.] := range []rune(:[s.])'
 rewrite='for _, :[r] := range :[s]'
 
+############################################
+# https://staticcheck.io/docs/checks#S1031 #
+############################################
+[S1031]
+match='if :[[s]] != nil { for _, :[[x]] := range :[[s]] { :[body] } }'
+rewrite='''
+for _, :[[x]] := range :[[s]] {
+    :[body]
+}'''
 
 ############################################
 # https://staticcheck.io/docs/checks#S1032 #
@@ -468,3 +505,10 @@ rewrite='":[s]"'
 [SA4021]
 match=':[[a]] = append(:[[b]])'
 rewrite=':[[a]] = :[[b]]'
+
+############################################
+#https://staticcheck.io/docs/checks#SA4024 #
+############################################
+[SA4024]
+match='if len(:[[a]]) < 0 {:[body]}'
+rewrite=''
