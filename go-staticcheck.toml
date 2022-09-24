@@ -461,3 +461,10 @@ rewrite='fmt.Sprintf(":[1]\n", :[2])'
 [S1039]
 match='fmt.Sprintf("%s", ":[s]")'
 rewrite='":[s]"'
+
+############################################
+#https://staticcheck.io/docs/checks#SA4021 #
+############################################
+[SA4021]
+match=':[[a]] = append(:[[b]])'
+rewrite=':[[a]] = :[[b]]'
